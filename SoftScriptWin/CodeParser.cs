@@ -17,7 +17,7 @@ namespace SoftScript
             bool inExpression = false;
             NodeType currentMod = NodeType.NoOperation;
 
-            Queue<Node> BlockLevel = new Queue<Node>();
+            Stack<Node> BlockLevel = new Stack<Node>();
 
             using (TokenReader tr = new TokenReader(source))
             {
@@ -27,19 +27,39 @@ namespace SoftScript
                         continue;
                     if (tr.EqualTo("if"))
                     {
-                        BlockLevel.Enqueue(new Node(NodeType.JumpNotTrue));
+                        BlockLevel.Push(new Node(NodeType.JumpNotTrue));
+                        inExpression = true;
+                    }else if (tr.EqualTo("while"))
+                    {
+                        BlockLevel.Push(new Node(NodeType.JumpNotTrue, Nodes.Count));
                         inExpression = true;
                     }
-                    else if (tr.EqualTo("then"))
+                    else if( tr.EqualTo("is", "smaller", "then"))
+                    {
+                        currentMod = NodeType.Smaller;
+                        tr.MoveNext(2);
+                    }
+                    else if (tr.EqualTo("is", "larger", "then"))
+                    {
+                        currentMod = NodeType.Larger;
+                        tr.MoveNext(2);
+                    }
+                    else if (tr.EqualTo("then") || tr.EqualTo("loop"))
                     {
                         Nodes.Add(BlockLevel.Peek());
                         inExpression = false;
                     }
                     else if (tr.EqualTo("end"))
                     {
-                        BlockLevel.Dequeue().A = Nodes.Count;
+                        BlockLevel.Pop().A = Nodes.Count;
                         Nodes.Add(new Node(NodeType.NoOperation));
-
+                    }
+                    else if (tr.EqualTo("next"))
+                    {
+                        var lvl = BlockLevel.Pop();
+                        Nodes.Add(new Node(NodeType.GoTo, lvl.A));
+                        lvl.A = Nodes.Count;
+                        Nodes.Add(new Node(NodeType.NoOperation));
                     }
                     else if (tr.EqualTo("increment"))
                     {
@@ -52,7 +72,7 @@ namespace SoftScript
                         {
                             throw new Exception("Expected a variable after increment");
                         }
-                    }
+                    }                    
                     else if (tr.EqualTo("decrement"))
                     {
                         if (tr.MoveNext() && !tr.IsNumberLiteral())
@@ -106,15 +126,13 @@ namespace SoftScript
                         }
                     }
                     else if (tr.EqualTo("is", "not", "equal", "to"))
-                    {
-                        //   Nodes.Add(new Node(NodeType.NotEqual));
+                    {                        
                         currentMod = NodeType.NotEqual;
                         tr.MoveNext(3);
                     }
                     else if (tr.EqualTo("is", "equal", "to"))
                     {
-                        currentMod = NodeType.Equal;
-                        //Nodes.Add(new Node(NodeType.Equal));
+                        currentMod = NodeType.Equal;                        
                         tr.MoveNext(2);
                     }
                     else if (tr.EqualTo("a", "variable", "named"))

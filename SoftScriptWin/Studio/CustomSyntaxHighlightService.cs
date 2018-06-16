@@ -17,7 +17,7 @@ namespace SoftScript.Stuidio
         SyntaxHighlightProperties stringSettings = new SyntaxHighlightProperties() { ForeColor = Color.Green };
 
         string[] keywords = new string[] {
-                "equals", "decrement", "a variable named", "is not equal", "is equal", "then", "end", "write", "to the console", "if" };
+                "equals", "decrement", "increment", "a variable named", "is not equal", "is equal", "end", "write", "to the console", "if", "loop" ,"while", "next", "is larger then", "is smaller then", "then"};
 
         public CustomSyntaxHighlightService(Document document)
         {
@@ -60,13 +60,6 @@ namespace SoftScript.Stuidio
                     if (!IsRangeInTokens(ranges[j], tokens))
                         tokens.Add(new SyntaxHighlightToken(ranges[j].Start.ToInt(), ranges[j].Length, keywordSettings));
                 }
-            }
-
-            ranges = document.FindAll("'", SearchOptions.None);
-            for (int i = 0; i < ranges.Length / 2; i++)
-            {
-                tokens.Add(new SyntaxHighlightToken(ranges[i * 2].Start.ToInt(),
-                    ranges[i * 2 + 1].Start.ToInt() - ranges[i * 2].Start.ToInt() + 1, stringSettings));
             }
             // order tokens by their start position
             tokens.Sort(new SyntaxHighlightTokenComparer());

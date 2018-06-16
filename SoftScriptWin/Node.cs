@@ -42,13 +42,16 @@ namespace SoftScript
         JumpNotTrue,
         NotEqual,
         Equal,
+        Smaller,
+        Larger,
         LoadNumLiteral,
         LoadNumLiteralAndStoreLocal,
         LoadLocalAndStoreLocal,
         LoadLocalWriteConsole,
         LoadNumLiteralWriteConsole,
         Increment,
-        Decrement,
+        Decrement,        
+        GoTo,
         NoOperation
     }
 }

@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using DevExpress.XtraEditors;
 using SoftScript.Stuidio;
 using DevExpress.XtraRichEdit.Services;
+using System.Diagnostics;
 
 namespace SoftScript
 {
@@ -26,28 +27,24 @@ namespace SoftScript
             //richEditControl1.Document.Sections[0].Page.Width = Units.InchesToDocumentsF(80f);
             //richEditControl1.Document.DefaultCharacterProperties.FontName = "Courier New";
 
-            richEditControl1.Text = @"a equals 10
-b equals 15
+            richEditControl1.Text = @"a equals 1
+b equals 100000
 
-decrement b
-decrement b
-decrement b
-decrement b
-decrement b
-
-if a variable named a is not equal to a variable named b then 
-    a equals b
-end
-
-write a to the console
+while a is smaller then b loop
+	
+	increment a
+next
 ";
         }
 
         private void barButtonItem1_ItemClick(object sender, DevExpress.XtraBars.ItemClickEventArgs e)
         {
             var value = CodeParser.Parse(richEditControl1.Text);
-
+            var sw = Stopwatch.StartNew();
             Executor.ExecuteNodes(value.nodes, value.variableCount);
+            sw.Stop();
+            Console.WriteLine(sw.ElapsedMilliseconds + " ms");
+
         }
     }
 }

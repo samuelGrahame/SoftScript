@@ -15,12 +15,11 @@ namespace SoftScript
 
             var stack = new Stack<dynamic>();
             dynamic[] vars = new dynamic[localCount];
-
+            Node node;
             while (i < length)
             {
                 int pi = i;
-                var node = nodes[i];
-                switch (node.NodeType)
+                switch ((node = nodes[i]).NodeType)
                 {
                     case NodeType.LoadLocal:
                         stack.Push(vars[node.A]);
@@ -33,6 +32,12 @@ namespace SoftScript
                         break;
                     case NodeType.NotEqual:
                         stack.Push(stack.Pop() != stack.Pop());
+                        break;
+                    case NodeType.Smaller:
+                        stack.Push(stack.Pop() >= stack.Pop());
+                        break;
+                    case NodeType.Larger:
+                        stack.Push(stack.Pop() <= stack.Pop());
                         break;
                     case NodeType.Equal:
                         stack.Push(stack.Pop() == stack.Pop());
@@ -58,6 +63,9 @@ namespace SoftScript
                     case NodeType.Decrement:
                         vars[node.A]--;
                         break;
+                    case NodeType.GoTo:
+                        i = node.A;
+                        break;                    
                     case NodeType.NoOperation:
                         break;
                     default:
